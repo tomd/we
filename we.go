@@ -56,25 +56,19 @@ func New(e error, args_format_and_args ...interface{}) error {
 	if e == nil {
 		return nil
 	}
-	// Find our caller.
-	var pc [1]uintptr
-	n := runtime.Callers(2, pc[:]) // skip 2: we.New & runtime.Callers
-	if n != 1 {
-		panic(fmt.Sprintf("we.New(%v): runtime.Callers() == %d", e, n))
-	}
-	frame, _ := runtime.CallersFrames(pc[:]).Next()
-	funcname := frame.Function
+
+	funcname := caller(3) // skip 3: we.New(), we.caller() and runtime.Callers()
 	if !MainPrefix && strings.HasPrefix(funcname, "main.") {
 		funcname = funcname[5:]
 	}
-	// Format it.
+
 	args_str := ""
 	if len(args_format_and_args) > 0 {
 		format := args_format_and_args[0].(string)
 		args_str = fmt.Sprintf(format, args_format_and_args[1:]...)
 	}
 	msg := fmt.Sprintf("%s(%s): %s", funcname, args_str, e.Error())
-	// Set it.
+
 	if e, ok := e.(*wrapped_error); ok {
 		e.msg = msg
 		return e
@@ -106,4 +100,14 @@ func WithExitCode(code int, e error) error {
 	res.cause = e
 	res.code = code
 	return res
+}
+
+func caller(skip int) string {
+	var pc [1]uintptr
+	n := runtime.Callers(skip, pc[:])
+	if n != 1 {
+		panic(fmt.Sprintf("we.caller(): runtime.Callers() == %d", n))
+	}
+	frame, _ := runtime.CallersFrames(pc[:]).Next()
+	return frame.Function
 }
