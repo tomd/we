@@ -14,4 +14,5 @@ Any time you `return err;` do `return we.New(err);` instead.
 ## License
 
 2018, Tom Spangebu <tom@pogostick.net>
+
 CC0, see LICENSE/COPYING
