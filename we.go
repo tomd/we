@@ -56,18 +56,6 @@ func New(e error, args_format_and_args ...interface{}) error {
 	if e == nil {
 		return nil
 	}
-	res := new(wrapped_error)
-	// If we wrap a wrapped_error then copy the cause
-	// and exit code.  So cause will always be the
-	// innermost error (which cannot be a wrapped_error).
-	switch e := e.(type) {
-	case *wrapped_error:
-		res.cause = e.cause
-		res.code = e.code
-	default:
-		res.cause = e
-		res.code = DefaultExitCode
-	}
 	// Find our caller.
 	var pc [1]uintptr
 	n := runtime.Callers(2, pc[:]) // skip 2: we.New & runtime.Callers
@@ -85,7 +73,16 @@ func New(e error, args_format_and_args ...interface{}) error {
 		format := args_format_and_args[0].(string)
 		args_str = fmt.Sprintf(format, args_format_and_args[1:]...)
 	}
-	res.msg = fmt.Sprintf("%s(%s): %s", funcname, args_str, e.Error())
+	msg := fmt.Sprintf("%s(%s): %s", funcname, args_str, e.Error())
+	// Set it.
+	if e, ok := e.(*wrapped_error); ok {
+		e.msg = msg
+		return e
+	}
+	res := new(wrapped_error)
+	res.msg = msg
+	res.cause = e
+	res.code = DefaultExitCode
 	return res
 }
 
@@ -100,15 +97,13 @@ func WithExitCode(code int, e error) error {
 	if e == nil {
 		return nil
 	}
-	res := new(wrapped_error)
-	switch e := e.(type) {
-	case *wrapped_error:
-		res.cause = e.cause
-		res.msg = e.msg
-	default:
-		res.cause = e
-		res.msg = e.Error()
+	if e, ok := e.(*wrapped_error); ok {
+		e.code = code
+		return e
 	}
+	res := new(wrapped_error)
+	res.msg = e.Error()
+	res.cause = e
 	res.code = code
 	return res
 }
