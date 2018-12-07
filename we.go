@@ -54,7 +54,7 @@ func Cause(e error) error {
 
 func New(e error, args_format_and_args ...interface{}) error {
 	if e == nil {
-		panic("we.New(nil)")
+		return nil
 	}
 	res := new(wrapped_error)
 	// If we wrap a wrapped_error then copy the cause
@@ -98,7 +98,7 @@ func ExitCode(e error) int {
 
 func WithExitCode(code int, e error) error {
 	if e == nil {
-		panic("we.WithExitCode(nil)")
+		return nil
 	}
 	res := new(wrapped_error)
 	switch e := e.(type) {
