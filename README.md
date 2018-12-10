@@ -9,7 +9,9 @@ Any time you `return err` do `return we.New(err)` instead.
 
 `we.New(e)` => `"pkg.func(): e.Error()"`
 
-`we.New(e, "%d", 42)` => `"pkg.func(42): e.Error()"`
+`we.New(e, 42)` => `"pkg.func(42): e.Error()"`
+
+`we.Newf(e, "foo=%d", 42)` => `"pkg.func(foo=42): e.Error()"`
 
 ## License
 
