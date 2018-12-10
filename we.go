@@ -7,6 +7,9 @@
 //
 //	we.Newf(e, "foo=%d", 42) => "pkg.func(foo=42): e.Error()"
 //
+// Note for New/Newf/WithExitCode: if given a wrapped_error these
+// functions will actually just mutate the argument and return it.
+//
 package we
 
 import (
@@ -47,7 +50,7 @@ func new_newf(f bool, e error, args ...interface{}) error {
 		return nil
 	}
 
-	funcname := caller(4) // skip 4: we.New[f](), new_newf(), we.caller() and runtime.Callers()
+	funcname := caller(4) // skip 4: we.New[f](), we.new_newf(), we.caller() and runtime.Callers()
 	if !MainPrefix && strings.HasPrefix(funcname, "main.") {
 		funcname = funcname[5:]
 	}
