@@ -3,13 +3,13 @@
 "wrapped error" - Yet another package to ease error handling.
 Primary purpose is to make a log line that shows the call graph.
 
-Any time you `return err;` do `return we.New(err);` instead.
+Any time you `return err` do `return we.New(err)` instead.
 
 ## Usage
 
-`we.New(err)` => `"pkg.funcname(): err"`
+`we.New(e)` => `"pkg.func(): e.Error()"`
 
-`we.New(err, "%d", 42)` => `"pkg.funcname(42): err"`
+`we.New(e, "%d", 42)` => `"pkg.func(42): e.Error()"`
 
 ## License
 
