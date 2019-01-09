@@ -122,3 +122,8 @@ func caller(skip int) string {
 	frame, _ := runtime.CallersFrames(pc[:]).Next()
 	return frame.Function
 }
+
+// Errorf == fmt.Errorf
+func Errorf(format string, a ...interface{}) error {
+	return fmt.Errorf(format, a...)
+}
