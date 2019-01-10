@@ -7,12 +7,19 @@
 //
 //	we.Newf(e, "foo=%d", 42) => "pkg.func(foo=42): e.Error()"
 //
-// Note for New/Newf/WithExitCode: if given a wrapped_error these
-// functions will actually just mutate the argument and return it.
+// "we" can also keep track of an exit code the caller may
+// extract with we.ExitCode():
+//
+//	we.ExitCode(we.WithExitCode(42, e)) == 42
+//
+// Note for New/Newf/NewEC/NewfEC/WithExitCode:
+// if given a wrapped_error these functions will actually just mutate
+// the wrapped_error and return it.
 //
 package we
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 	"strings"
@@ -135,7 +142,11 @@ func caller(skip int) string {
 	return frame.Function
 }
 
-// Errorf == fmt.Errorf
+// Errorf == errors.New / fmt.Errorf.  When you don't want to import errors
+// or fmt just to create a new error.
 func Errorf(format string, a ...interface{}) error {
+	if len(a) == 0 {
+		return errors.New(format)
+	}
 	return fmt.Errorf(format, a...)
 }
