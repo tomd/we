@@ -7,12 +7,18 @@
 //
 //	we.Newf(e, "foo=%d", 42) => "pkg.func(foo=42): e.Error()"
 //
+// "we" can also prepend just a formatted message:
+//
+//	we.Prependf(e, "foo %s", "bar") => "foo bar: e.Error()"
+//
+//	we.New(we.Prependf(e, "bummer")) => "pkg.func(): bummer: e.Error()"
+//
 // "we" can also keep track of an exit code the caller may
 // extract with we.ExitCode():
 //
 //	we.ExitCode(we.WithExitCode(42, e)) == 42
 //
-// Note for New/Newf/NewEC/NewfEC/WithExitCode:
+// Note for New/Newf/NewEC/NewfEC/WithExitCode/Prependf:
 // if given a wrapped_error these functions will actually just mutate
 // the wrapped_error and return it.
 //
