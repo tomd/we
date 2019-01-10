@@ -19,7 +19,6 @@
 package we
 
 import (
-	"errors"
 	"fmt"
 	"runtime"
 	"strings"
@@ -142,11 +141,23 @@ func caller(skip int) string {
 	return frame.Function
 }
 
-// Errorf == errors.New / fmt.Errorf.  When you don't want to import errors
-// or fmt just to create a new error.
-func Errorf(format string, a ...interface{}) error {
-	if len(a) == 0 {
-		return errors.New(format)
+// Prependf create a new wrapped_error without caller(...)
+func Prependf(e error, format string, args ...interface{}) error {
+	prefix := fmt.Sprintf(format, args...)
+	msg := fmt.Sprintf("%s: %s", prefix, e.Error())
+
+	if e, ok := e.(*wrapped_error); ok {
+		e.msg = msg
+		return e
 	}
+	res := new(wrapped_error)
+	res.msg = msg
+	res.cause = e
+	res.code = DefaultExitCode
+	return res
+}
+
+// Errorf == fmt.Errorf.  When you don't want to import fmt.
+func Errorf(format string, a ...interface{}) error {
 	return fmt.Errorf(format, a...)
 }
