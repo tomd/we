@@ -50,7 +50,7 @@ func new_newf(f bool, e error, args ...interface{}) error {
 		return nil
 	}
 
-	funcname := caller(4) // skip 4: we.New[f](), we.new_newf(), we.caller() and runtime.Callers()
+	funcname := caller(4) // skip 4: New[f][EC](), new_newf(), caller() and runtime.Callers()
 	if !MainPrefix && strings.HasPrefix(funcname, "main.") {
 		funcname = funcname[5:]
 	}
@@ -90,12 +90,14 @@ func Newf(e error, format_and_args ...interface{}) error {
 
 // NewEC == New + WithExitCode
 func NewEC(code int, e error, args ...interface{}) error {
-	return WithExitCode(code, New(e, args...))
+	res := new_newf(false, e, args...)
+	return WithExitCode(code, res)
 }
 
 // NewfEC == Newf + WithExitCode
 func NewfEC(code int, e error, format_and_args ...interface{}) error {
-	return WithExitCode(code, Newf(e, format_and_args...))
+	res := new_newf(true, e, format_and_args...)
+	return WithExitCode(code, res)
 }
 
 // ExitCode extracts the exit code if e is a wrapped_error, otherwise returns DefaultExitCode.
