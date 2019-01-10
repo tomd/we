@@ -88,6 +88,16 @@ func Newf(e error, format_and_args ...interface{}) error {
 	return new_newf(true, e, format_and_args...)
 }
 
+// NewEC == New + WithExitCode
+func NewEC(code int, e error, args ...interface{}) error {
+	return WithExitCode(code, New(e, args...))
+}
+
+// NewfEC == Newf + WithExitCode
+func NewfEC(code int, e error, format_and_args ...interface{}) error {
+	return WithExitCode(code, Newf(e, format_and_args...))
+}
+
 // ExitCode extracts the exit code if e is a wrapped_error, otherwise returns DefaultExitCode.
 func ExitCode(e error) int {
 	if e, ok := e.(*wrapped_error); ok {
